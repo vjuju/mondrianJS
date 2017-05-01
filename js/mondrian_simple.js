@@ -382,12 +382,50 @@ function updateBoxFromStruct(struct, parentBox) {
 $(document).ready(function () {
 	mondrian.init_structure();
 	mondrian.render();
+	//adjust_background_sizes();
 
 	//building_structure_from_contents(root_test, contents);
 	//$('#frame').append($("<div></div>"))
 
 });
 
+$(window).resize(function () {
+	adjust_background_sizes();
+});
+
+$(window).load(function () {
+	adjust_background_sizes();
+});
+
+function adjust_background_sizes(){
+	console.log('adjusting_sizes');
+	$('.content').each(function(i,obj) {
+		var image_url = $(obj).css('background-image');
+		if (image_url != 'none'){
+			console.log(image_url);
+			var image = getImage(image_url);
+			$(obj).css('background-size', getAdaptedBackgroundSize(image));
+		}
+		//css('background-size','100% auto' );
+	});
+	//background-size: 100% auto;/*3432px 1931px ;*/
+}
+
+function getImage(image_url){
+	var sizes = "";
+	var image_url = image_url.match(/^url\("?(.+?)"?\)$/);
+	if (image_url[1]) {
+		image_url = image_url[1];
+		image = new Image();
+		image.src = image_url;
+	}
+	return image;
+}
+
+function getAdaptedBackgroundSize(image){
+	//To do retrieve this function from previous work
+	return '100% auto'
+}
 
 
 //////// CONTROLLER

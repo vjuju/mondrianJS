@@ -80,7 +80,10 @@ body {
     top : 0px;
     bottom: 0px;
     right : 0px;
-    left:0px;   
+    left:0px;
+    background-attachment: fixed; 
+    background-origin: 0px 0px;
+	background-repeat: no-repeat;
 }
 
 .innerBox .content {
