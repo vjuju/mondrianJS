@@ -74,6 +74,15 @@ body {
     display: block;
 }
 
+
+.aggregate .innerBox {
+    display: block;
+}
+
+.aggregate .box  {
+    display: none;
+}
+
 .content {
     position:absolute;
     display: none;

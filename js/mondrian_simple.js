@@ -22,18 +22,32 @@
 */
 
 var NB_BOXES = 5;
-var contents = [{id:'Coucool', area:30},
-				{id:'Participations', area:30},
-				{id:'Infos', area:15},
-				{id:'Benevoles', area:10},
-				{id:'Principes', area:10},
-				{id:'Curiosites', area:5,
-					contents: [{id:'Eros', area:30},
-					{id:'Definitions', area:30},
-					{id:'Links', area:40}
+
+
+var contents = [{id:'Coucool', area:40},
+				{id:'Participations', area:40},
+				{id:'Curiosites', area:20,
+					contents: [{id:'Eros', area:15},
+					{id:'Definitions', area:5},
+					{id:'Liens', area:80}
 					]
 				}
 				]
+
+/*			
+var contents = [{id:'Coucool', area:30},
+				{id:'Participations', area:21},
+				{id:'Infos', area:15},
+				{id:'Benevoles', area:10},
+				{id:'Principes', area:9},
+				{id:'Curiosites', area:15,
+					contents: [{id:'Eros', area:40},
+					{id:'Definitions', area:30},
+					{id:'Liens', area:30}
+					]
+				}
+				]
+*/
 				
 var root_test = new Structure();
 
@@ -45,6 +59,7 @@ function compare_contents_areas(a, b) {
 	return sign
 }
 
+
 function building_structure_from_contents(root, contents){
 	// var contents_array = Object.keys(contents).map(function (key) { return {'key':key, 'size':; });
 	// In the complex version we pick randomly two contents to create a structure that contains those 2 contents than
@@ -52,24 +67,45 @@ function building_structure_from_contents(root, contents){
 	// Simplest version where we order the area and split recursively the structure to obtain the area we are looking for
 	var ordered_contents = contents.sort(compare_contents_areas);
 	console.log(ordered_contents);
-	console.log(root.getArea());
 	
 	j = 0 
 	var leave_to_insert = root;
 	var position = pickInArray(positions);
-	for ( var j = 0 ; j < ordered_contents.length-1; j++ ) {
+	for ( var j = 0 ; j < ordered_contents.length; j++ ) {
 		var content = ordered_contents[j];
-		var struct = new Structure ({
+		
+		if(j < ordered_contents.length-1) {
+			if(leave_to_insert.contents) {
+				console.log(leave_to_insert.contents.id);
+				console.log(leave_to_insert.getArea(root))
+			}
+			console.log(leave_to_insert.id)
+			console.log(content)
+			console.log(leave_to_insert.getArea(root))
+			var struct = new Structure ({
 					'position' : position,
 					'size' : content.area/leave_to_insert.getArea(root) * 100,
+					'color' : pickInArray(["yellow","pink","blue","green"]),
 					'contents' : content
 					})
-		leave_to_insert.insert(struct);
-		position = alternate(position)
+			leave_to_insert.insert(struct);
+			if(content.contents && content.contents.length > 0) {
+				console.log('we are in');
+				struct.aggregate = true;
+				building_structure_from_contents(struct, content.contents);
+			}
+		} else {
+			leave_to_insert.contents = ordered_contents[j];
+			if(content.contents && content.contents.length > 0) {
+				console.log('we are in');
+				leave_to_insert.aggregate = true;
+				building_structure_from_contents(leave_to_insert, content.contents);
+			}
+		}
+		
+		position = alternate(position);
 		leave_to_insert = struct.getComplementary(root);
 	}
-	leave_to_insert.contents = ordered_contents[j];
-	console.log(leave_to_insert);
 }
 
 function building_random_structure_with_content(root, contents){
@@ -77,7 +113,7 @@ function building_random_structure_with_content(root, contents){
 	var contents_array = Object.keys(contents).map(function (key) { return key; });
 	for ( var j = 1 ; j < NB_BOXES; j++ ) {
 		var content = ( j < (contents.length + 1) ) ? contents[j-1] : null
-		console.log(content);
+		//console.log(content);
 		var random_struct = {
 			'position' : pickInArray(positions),
 			'size' : pickAnIntegerBetween(40, 60),
@@ -126,8 +162,6 @@ function opposite(position) {
 function alternate(position) {
 	var horizontal = ["top","bottom"]
 	var vertical = ["left","right"]
-	console.log(position)
-	console.log(horizontal.indexOf(position))
 	if (horizontal.indexOf(position)>=0) {
 		return pickInArray(vertical)
 	}
@@ -194,7 +228,7 @@ var mondrian = {
 	},
 
 	animate : function() {
-		$(".endBox").click(onBoxClick);
+		$(".endBox, .aggregate").click(onBoxClick);
 	},
 
 	requireUpdate : function() {
@@ -204,7 +238,7 @@ var mondrian = {
 	setFocusId : function(id) {
 		if (this.focusedId != id) {
 			this.focusedId = id;
-			//this.structure.getById(id).increase();
+			this.structure.getById(id).setAggregate(false);
 			this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
 		}
 	},
@@ -224,6 +258,7 @@ function Structure(obj) {
 	this.size = (obj && obj.size) ? obj.size : 100;
 	this.color = (obj && obj.color) ? obj.color : 'white';
 	this.contents = (obj && obj.contents) ? obj.contents : null;
+	this.aggregate = (obj && obj.aggregate) ? obj.aggregate : false;
 	//this.parent = parent ? parent : null; // we create here a circular structure
 	this.child1 = (obj && obj.child1) ? new Structure(obj.child1) : null;
 	this.child2 = (obj && obj.child2) ? new Structure(obj.child2) : null;
@@ -231,8 +266,8 @@ function Structure(obj) {
 
 Structure.prototype.insert = function(struct) {
 	//struct.parent = this;
-	var positionFirstLetter = this.position.substr(0,1)
-	var oppositePositionFirstLetter = opposite(this.position).substr(0,1)
+	var positionFirstLetter = struct.position.substr(0,1)
+	var oppositePositionFirstLetter = opposite(struct.position).substr(0,1)
 	this.child1 = struct;
 	this.child2 = struct.complementary();
 	this.child1.id = this.id + positionFirstLetter;
@@ -249,6 +284,16 @@ Structure.prototype.getById = function(id) {
 	} else {
 		return null;
 	}
+}
+
+Structure.prototype.getByContentsId = function(contentsId) { 
+	var structs = []
+	this.applyAllChidren(function(struct) {
+		if (struct.contents && struct.contents.id == contentsId) {
+			structs.push(struct);
+		}
+	});
+	return structs;
 }
 
 Structure.prototype.clone = function() {
@@ -278,7 +323,12 @@ Structure.prototype.getParent = function(root) {
 
 Structure.prototype.getArea = function(root) {
 	var area = 100;
-	this.applyAllParents(root, function (struct) { area = area*struct.size/100});
+	this.applyAllParents(root, function (struct) { 
+		area = area*struct.size/100
+		//console.log(struct.id);
+		//console.log(struct.size);
+		//console.log(area);
+	}, true);
 	return area;
 };
 
@@ -294,9 +344,16 @@ Structure.prototype.setSize = function(size) {
 	mondrian.requireUpdate();
 };
 
+Structure.prototype.setAggregate = function(value) {
+	if (this.aggregate != value) {
+		this.aggregate = value;
+		mondrian.requireUpdate();
+	}
+};
+
 Structure.prototype.increase = function() {
 	var id = this.id;
-	console.log(id);
+
 	this.size = this.size+1;
 	this.getComplementary(mondrian.structure).size = (100 - this.size - 1);
 	if (this.id != mondrian.structure.id && this.size < 100) {
@@ -308,11 +365,17 @@ Structure.prototype.increase = function() {
 };
 
 
-Structure.prototype.applyAllParents = function(root, callback) {
-	console.log(this.id)
-	callback(this);
-	if(this.getParent(root)){
-		this.getParent(root).applyAllParents(root, callback);
+Structure.prototype.applyAllParents = function(root, callback, post=false) {
+	if (post) {
+		if(this.getParent(root)){
+			callback(this.getParent(root));
+			this.getParent(root).applyAllParents(root, callback, post);
+		}
+	} else {
+		callback(this);
+		if(this.getParent(root)){
+			this.getParent(root).applyAllParents(root, callback, post);
+		}
 	}
 }
 
@@ -326,6 +389,16 @@ Structure.prototype.applyEndLeaves = function(callback) {
 		if(this.child2){
 			this.child2.applyEndLeaves(callback);
 		}
+	}
+}
+
+Structure.prototype.applyAllChidren = function(callback) {
+	callback(this);
+	if(this.child1){
+		this.child1.applyAllChidren(callback);
+	}
+	if(this.child2){
+		this.child2.applyAllChidren(callback);
 	}
 }
 
@@ -349,7 +422,6 @@ function createBoxFromStruct(struct, parentBox) {
 		var contents = $("#" + struct.contents.id);
 		innerBox.append(contents)
 	}
-
 	setBox(box,struct);
 	parentBox.append(box);
 	parentBox.removeClass("endBox");
@@ -362,13 +434,15 @@ function setBox(box,struct){
 	box.css(attributeToApplySize, struct.size + "%");
 	box.addClass(struct.position);
 	box.attr("id",struct.id);
+	if (struct.aggregate) {
+		box.addClass('aggregate');
+	} else {
+		box.removeClass('aggregate');
+	}
 }
 
 
 function updateBoxFromStruct(struct, parentBox) {
-	//console.log("updating")
-	//console.log(struct.size)
-	//console.log(struct.id)
 	var box = $("#"+struct.id);
 	setBox(box,struct);
 	if (struct.child1) {updateBoxFromStruct(struct.child1, box)};
@@ -397,11 +471,11 @@ $(window).load(function () {
 });
 
 function adjust_background_sizes(){
-	console.log('adjusting_sizes');
+	//console.log('adjusting_sizes');
 	$('.content').each(function(i,obj) {
 		var image_url = $(obj).css('background-image');
 		if (image_url != 'none'){
-			console.log(image_url);
+			//console.log(image_url);
 			var image = getImage(image_url);
 			$(obj).css('background-size', getAdaptedBackgroundSize(image));
 		}
@@ -430,8 +504,6 @@ function getAdaptedBackgroundSize(image){
 //////// CONTROLLER
 
 function onBoxClick() {
-	console.log("pouet");
-	console.log($(this).attr('id'));
 	mondrian.setFocusId($(this).attr('id'))
 }
 
