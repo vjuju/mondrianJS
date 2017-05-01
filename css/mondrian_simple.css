@@ -8,24 +8,28 @@ body {
 }
 
 
+.artwork {
+    background-image:url(../assets/artwork.jpg);
+}
+
 .trees {
-    background-image:url(../assets_cp/trees.jpg);
+    background-image:url(../assets/trees.jpg);
 }
 
 .night_sky {
-    background-image:url(../assets_cp/night_sky.jpg);
+    background-image:url(../assets/night_sky.jpg);
 }
 
 .blue_clouds {
-    background-image:url(../assets_cp/blue_clouds.jpg);
+    background-image:url(../assets/blue_clouds.jpg);
 }
 
 .orange_clouds {
-    background-image:url(../assets_cp/orange_clouds.jpg);
+    background-image:url(../assets/orange_clouds.jpg);
 }
 
 .water {
-    background-image:url(../assets_cp/water.jpg);
+    background-image:url(../assets/water.jpg);
 }
 
 
@@ -45,7 +49,7 @@ body {
 }
 
 .box {
-        position:absolute;    
+        position:absolute; 
     /*
             border:solid;
     border-width: 15px;
@@ -62,10 +66,24 @@ body {
     top : 7px;
     bottom: 7px;
     right : 7px;
-    left:7px;   
+    left:7px;
+	overflow:hidden;
 }
 
 .endBox .innerBox {
+    display: block;
+}
+
+.content {
+    position:absolute;
+    display: none;
+    top : 0px;
+    bottom: 0px;
+    right : 0px;
+    left:0px;   
+}
+
+.innerBox .content {
     display: block;
 }
 
