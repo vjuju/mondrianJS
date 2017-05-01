@@ -56,7 +56,7 @@ body {
      */
 }
 
-.content {
+.innerBox {
     position:absolute;
     display: none;
     top : 7px;
@@ -65,7 +65,7 @@ body {
     left:7px;   
 }
 
-.endBox .content {
+.endBox .innerBox {
     display: block;
 }
 

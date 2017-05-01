@@ -255,9 +255,9 @@ Structure.prototype.listChildrenLeavesIds = function(id) {
 
 function createBoxFromStruct(struct, parentBox) {
 	var box = $("<div class='box transition endBox'></div>");
-	var content = $("<div class='content'></div>");
-	content.css("background-color", struct.color);
-	box.append(content);
+	var innerBox = $("<div class='innerBox'></div>");
+	innerBox.css("background-color", struct.color);
+	box.append(innerBox);
 
 	setBox(box,struct);
 	parentBox.append(box);
