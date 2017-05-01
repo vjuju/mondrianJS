@@ -62,7 +62,6 @@ function building_structure_from_contents(root, contents){
 		var struct = new Structure ({
 					'position' : position,
 					'size' : content.area/leave_to_insert.getArea(root) * 100,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
 					'contents' : content
 					})
 		leave_to_insert.insert(struct);
@@ -424,7 +423,7 @@ function getImage(image_url){
 
 function getAdaptedBackgroundSize(image){
 	//To do retrieve this function from previous work
-	return '100% auto'
+	return image.width + 'px ' + image.height + 'px'
 }
 
 
