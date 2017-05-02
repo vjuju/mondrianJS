@@ -21,8 +21,9 @@
 
 */
 
-var NB_BOXES = 5;
+//var NB_BOXES = 5;
 
+var BORDER_SIZE = 7;
 
 var contents = [{id:'Coucool', area:80},
 				{id:'Participations', area:10},
@@ -492,8 +493,44 @@ function getImage(image_url){
 
 function getAdaptedBackgroundSize(image){
 	//To do retrieve this function from previous work
-	return image.width + 'px ' + image.height + 'px'
+
+	var window_width = (parseInt(window.innerWidth)-2*BORDER_SIZE);
+	var window_height = (parseInt(window.innerHeight)-2*BORDER_SIZE);
+
+	var ratio_image = image.width/image.height;
+	var ratio_window = window_width/ window_height;
+
+	var required_image_width ;
+	var required_image_height ;
+
+	var required_image_offset_x ;
+	var required_image_offset_y ;
+
+	if (ratio_window > ratio_image) {
+			// Here the height of the canvas will be longer
+			required_image_width  = window_width;
+			required_image_height = window_width/ratio_image;
+		} else {
+			required_image_height = window_height;
+			required_image_width = window_height * ratio_image ;
+		}
+
+
+	/*
+	// To have it centered 
+			var difference_height = parseInt(window.innerHeight) - parseInt(canvas.style.height);
+			var difference_width= parseInt(window.innerWidth) - parseInt(canvas.style.width);
+			//canvas.style.marginLeft = difference_width /2;
+			//canvas.style.marginTop = difference_height/2;//(canvas.style.height)/
+			// To have an imression of window opening
+			var $parentEndBox = $("#" + canvas.parentElement.parentElement.id);
+			canvas.style.marginLeft = difference_width/2 - $parentEndBox.offset().left;
+			canvas.style.marginTop = difference_height/2 - $parentEndBox.offset().top;
+	*/
+
+	return required_image_width+ 'px ' + window_height + 'px'
 }
+
 
 
 //////// CONTROLLER
