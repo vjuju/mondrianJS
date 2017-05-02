@@ -24,12 +24,15 @@
 var NB_BOXES = 5;
 
 
-var contents = [{id:'Coucool', area:40},
-				{id:'Participations', area:40},
-				{id:'Curiosites', area:20,
-					contents: [{id:'Eros', area:15},
-					{id:'Definitions', area:5},
-					{id:'Liens', area:80}
+var contents = [{id:'Coucool', area:80},
+				{id:'Participations', area:10},
+				{id:'Infos', area:5},
+				{id:'Benevoles', area:2},
+				{id:'Principes', area:2},
+				{id:'Curiosites', area:1,
+					contents: [{id:'Eros', area:50},
+					{id:'Definitions', area:25},
+					{id:'Liens', area:25}
 					]
 				}
 				]
@@ -73,38 +76,29 @@ function building_structure_from_contents(root, contents){
 	var position = pickInArray(positions);
 	for ( var j = 0 ; j < ordered_contents.length; j++ ) {
 		var content = ordered_contents[j];
-		
+		var struct_with_content;
+
+		console.log(content);
+		console.log(leave_to_insert.getArea(root));
 		if(j < ordered_contents.length-1) {
-			if(leave_to_insert.contents) {
-				console.log(leave_to_insert.contents.id);
-				console.log(leave_to_insert.getArea(root))
-			}
-			console.log(leave_to_insert.id)
-			console.log(content)
-			console.log(leave_to_insert.getArea(root))
-			var struct = new Structure ({
+			position = alternate(position);
+			struct_with_content = new Structure ({
 					'position' : position,
-					'size' : content.area/leave_to_insert.getArea(root) * 100,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
-					'contents' : content
+					'size' : content.area / (leave_to_insert.getArea(root)) * 100,
+					'color' : pickInArray(["yellow","pink","blue","green"])
 					})
-			leave_to_insert.insert(struct);
-			if(content.contents && content.contents.length > 0) {
-				console.log('we are in');
-				struct.aggregate = true;
-				building_structure_from_contents(struct, content.contents);
-			}
+			leave_to_insert.insert(struct_with_content);
+			leave_to_insert = struct_with_content.getComplementary(root);
 		} else {
-			leave_to_insert.contents = ordered_contents[j];
-			if(content.contents && content.contents.length > 0) {
-				console.log('we are in');
-				leave_to_insert.aggregate = true;
-				building_structure_from_contents(leave_to_insert, content.contents);
-			}
+			struct_with_content = leave_to_insert
 		}
-		
-		position = alternate(position);
-		leave_to_insert = struct.getComplementary(root);
+		struct_with_content.contents = content;
+
+		if(content.contents && content.contents.length > 0) {
+			console.log('we are in');
+			struct_with_content.aggregate = true;
+			building_structure_from_contents(struct_with_content, content.contents);
+		}
 	}
 }
 
@@ -314,20 +308,21 @@ Structure.prototype.complementary = function() {
 };
 
 Structure.prototype.getParent = function(root) {
-	if (this.id.length > 1) {
-		return root.getById(this.id.substr(0, this.id.length - 1))
-	} else {
+	if (this == root) {
 		return null
-	}
+	} 
+	return root.getById(this.id.substr(0, this.id.length - 1))
 };
 
 Structure.prototype.getArea = function(root) {
-	var area = 100;
+	if(this == root) {
+		return 100;
+	}
+	var area = this.size;
 	this.applyAllParents(root, function (struct) { 
-		area = area*struct.size/100
-		//console.log(struct.id);
-		//console.log(struct.size);
-		//console.log(area);
+		if(struct != root) {
+			area = area*struct.size/100
+		}
 	}, true);
 	return area;
 };
