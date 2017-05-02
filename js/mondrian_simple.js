@@ -265,7 +265,9 @@ var mondrian = {
 	},
 
 	animate : function() {
-		$(".endBox, .aggregate").click(onBoxClick);
+		$(".endBox, .aggregate").click(focus);
+		$(".endBox, .aggregate").mouseenter(focus);
+		$(".endBox, .aggregate").mouseleave(unfocus);
 	},
 
 	requireUpdate : function() {
@@ -274,17 +276,15 @@ var mondrian = {
 
 	setFocusId : function(id) {
 		if (this.focusedId != id) {
-			this.focusedId = id;
-			this.structure.getById(id).setAggregate(false);
-			this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
-		}
-	},
-
-	backToInitial : function() {
-		if (!this.structure.equal(this.initialStructure)) {
-			this.focusedId = null;
-			this.structure = this.initialStructure.clone();
-			this.requireUpdate();
+			if(id != null) {
+				this.focusedId = id;
+				this.structure.getById(id).setAggregate(false);
+				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
+			} else {
+				this.focusedId = null;
+				this.structure = this.initialStructure.clone();
+				this.requireUpdate();
+			}
 		}
 	}
 }
@@ -607,10 +607,17 @@ function getAdaptedBackgroundOffset(required_image_width, required_image_height)
 
 //////// CONTROLLER
 
-function onBoxClick() {
-	mondrian.setFocusId($(this).attr('id'))
+function focus() {
+	console.log(this);
+	var struct = mondrian.structure.getById($(this).attr('id'));
+	if(struct.contents && struct.contents.id != "Coucool"){
+		mondrian.setFocusId($(this).attr('id'));
+	}
 }
 
+function unfocus() {
+	mondrian.setFocusId(null);
+}
 /*
  
 Structure.prototype.listChildrenIds = function(id) { 
