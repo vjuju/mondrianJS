@@ -8,6 +8,20 @@ body {
 }
 
 
+.content {
+    position:absolute;
+    display: none;
+    top : 0px;
+    bottom: 0px;
+    right : 0px;
+    left:0px;
+    background-attachment: fixed; 
+    background-origin: 0px 0px;
+	background-repeat: no-repeat;
+	background-size: 0px 0px;
+}
+
+
 .artwork {
     background-image:url(../assets/artwork.jpg);
 }
@@ -81,18 +95,6 @@ body {
 
 .aggregate .box  {
     display: none;
-}
-
-.content {
-    position:absolute;
-    display: none;
-    top : 0px;
-    bottom: 0px;
-    right : 0px;
-    left:0px;
-    background-attachment: fixed; 
-    background-origin: 0px 0px;
-	background-repeat: no-repeat;
 }
 
 .innerBox .content {
