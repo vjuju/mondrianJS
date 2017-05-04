@@ -7,6 +7,30 @@ body {
     /*text-shadow: 2px 2px #ff0000;*/
 }
 
+.fixedheader {
+    position: fixed;
+    text-align: left;
+    left:15px;
+    right:15px;
+    font-size:22px;
+    height: 35px;
+    line-height: 40px;
+}
+
+.fixedfooter {
+    position: fixed;
+    bottom: 0px;
+    left:15px;
+    right:15px;
+    font-size:16px;
+    height: 25px;
+    line-height: 28px;
+}
+
+.content.static {
+    background-attachment:initial !important;
+    background-size:cover !important;
+}
 
 .content {
     position:absolute;
@@ -15,11 +39,11 @@ body {
     bottom: 0px;
     right : 0px;
     left:0px;
-    background-attachment: fixed; 
     background-origin: 0px 0px;
 	background-repeat: no-repeat;
 	background-size: 0px 0px;
 }
+
 
 
 .artwork {
@@ -49,9 +73,9 @@ body {
 
 #frame {
     position:absolute;
-    top:7px;
+    top:35px;
+    bottom:25px;
     left:7px;
-    bottom:7px;
     right:7px;
  
 
@@ -77,10 +101,6 @@ body {
 .innerBox {
     position:absolute;
     display: none;
-    top : 7px;
-    bottom: 7px;
-    right : 7px;
-    left:7px;
 	overflow:hidden;
 }
 

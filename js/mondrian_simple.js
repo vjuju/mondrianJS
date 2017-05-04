@@ -81,8 +81,8 @@ function building_structure_with_custom_start(root) {
 				];
 	
 	var image_ratio = 1.8046499873641648; //image.width/image.height;
-	var window_width = (parseInt(window.innerWidth)-2*BORDER_SIZE);
-	var window_height = (parseInt(window.innerHeight)-2*BORDER_SIZE);
+	var window_width = $("#frame").width();
+	var window_height = $("#frame").height();
 	var position_coucool, size_coucool, struct_coucool, struct_participations;
 	// If the width is too small, we want Coucool box to be the first one 
 	if(parseInt(window.innerWidth)<768) {
@@ -98,6 +98,37 @@ function building_structure_with_custom_start(root) {
 		root.insert(struct_coucool);	
 		building_structure_from_contents(struct_coucool.getComplementary(root), contents_without_Coucool)
 	} else {
+		// Let's assume 
+		var first_size = 60;
+		var first_struct = new Structure ({
+					'position' : pickInArray(["left","right"]),
+					'size' : first_size,
+					'color' : pickInArray(["yellow","pink","blue","green"])
+					})
+		root.insert(first_struct);
+
+		position_coucool = pickInArray(["top","bottom"]);
+		width_coucool = first_size * window_width / 100 - 2 * BORDER_SIZE;
+		requested_height_coucool = width_coucool/image_ratio;
+		size_coucool = (requested_height_coucool + 2 * BORDER_SIZE) / (window_height) * 100;
+
+		console.log(window_width);
+		console.log(width_coucool);
+		console.log(requested_height_coucool);
+		console.log(size_coucool);
+
+		struct_coucool = new Structure ({
+					'position' : position_coucool,
+					'size' : size_coucool,
+					'color' : pickInArray(["yellow","pink","blue","green"]),
+					'contents' : {id:"Coucool", area: size_coucool * first_size /100 }
+					})
+		first_struct.insert(struct_coucool);
+		struct_coucool.getComplementary(root).contents = {id:"Participations", area: (100-size_coucool) * first_size /100 };
+		struct_coucool.getComplementary(root).color = pickInArray(["yellow","pink","blue","green"]);
+		building_structure_from_contents(first_struct.getComplementary(root), contents_without_Coucool_and_participations);
+
+		/*
 		var size_participations = 30;
 		var position_participations = pickInArray(["left","right"])
 		struct_participations = new Structure ({
@@ -108,7 +139,9 @@ function building_structure_with_custom_start(root) {
 					})
 		root.insert(struct_participations);
 		position_coucool = pickInArray(["top","bottom"]);
-		size_coucool = (100 - size_participations) * (window_width/image_ratio) / window_height;
+		width_coucool = (100 - size_participations) * window_width - 2 * BORDER_SIZE;
+		requested_height_coucool = width_coucool/image_ratio;
+		size_coucool = (requested_height_coucool + 2 * BORDER_SIZE) / (window_height - 2 * BORDER_SIZE);
 		struct_coucool = new Structure ({
 					'position' : position_coucool,
 					'size' : size_coucool,
@@ -117,6 +150,8 @@ function building_structure_with_custom_start(root) {
 					})
 		struct_participations.getComplementary(root).insert(struct_coucool);
 		building_structure_from_contents(struct_coucool.getComplementary(root), contents_without_Coucool_and_participations);
+		*/
+
 		//building_structure_from_contents(root, contents)
 	}
 	// This is the rest of the contents 
@@ -246,7 +281,7 @@ var mondrian = {
 		setTimeout(function(){
 			mondrian.render();
 		}, polling_delay); //requestAnimationFrame( render );
-		adjust_background_sizes(true);
+		//adjust_static_background_sizes();
 		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
 		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
 		mondrian.focusContents(getContentIdFromUrl());
@@ -494,6 +529,10 @@ function createBoxFromStruct(struct, parentBox) {
 	var box = $("<div class='box transition endBox'></div>");
 	var innerBox = $("<div class='innerBox'></div>");
 	innerBox.css("background-color", struct.color);
+	innerBox.css('top', BORDER_SIZE + 'px'); 
+	innerBox.css('bottom', BORDER_SIZE + 'px'); 
+	innerBox.css('right', BORDER_SIZE + 'px'); 
+	innerBox.css('left', BORDER_SIZE + 'px'); 
 	box.append(innerBox);
 	if (struct.contents) {
 		var contents = $("#" + struct.contents.id);
@@ -531,11 +570,10 @@ function updateBoxFromStruct(struct, parentBox) {
 
 $(document).ready(function () {
 	mondrian.init_structure();
+	mondrian.focusContents("Coucool");
+	setTimeout(function(){mondrian.setFocusId(null)}, 2000);
 	mondrian.render();
 });
-
-
-
 
 
 
@@ -628,12 +666,23 @@ $(window).load(function () {
 	adjust_background_sizes();
 });
 
-function adjust_background_sizes(only_static=false){
+function adjust_background_sizes(){
+	adjust_non_static_background_sizes();
+	//adjust_static_background_sizes();
+}
+
+function adjust_non_static_background_sizes() {
 	$('.content').each(function(i,obj) {
 		var is_not_static = $(obj).attr('class').indexOf('static') < 0
-		if(!only_static || !is_not_static) {
-			imitate_background_cover_behaviour(obj, is_not_static);
+		if(is_not_static) {
+			imitate_background_cover_behaviour(obj, true);
 		}
+	});
+}
+
+function adjust_static_background_sizes() {
+	$('.static').each(function(i,obj) {
+		imitate_background_cover_behaviour(obj, false);
 	});
 }
 
@@ -643,16 +692,19 @@ function imitate_background_cover_behaviour(obj, cover_window){
 		var image = getImage(image_url);
 
 		var window_width = cover_window ? parseInt(window.innerWidth)-2*BORDER_SIZE : $(obj).width() ;
-		var window_height = cover_window ? parseInt(window.innerHeight)-2*BORDER_SIZE : $(obj).height() ;
+		var window_height = cover_window ? parseInt(window.innerHeight)-2*BORDER_SIZE : $(obj).height()  ;
 
 		var backgroundSize = getAdaptedBackgroundSize(image, window_width, window_height);
 		var bgSizeString = backgroundSize[0]+ 'px ' + backgroundSize[1] + 'px'
 		$(obj).css('background-size', bgSizeString);
 
+		/*
+		var offset = getAdaptedBackgroundOffset(backgroundSize[0], backgroundSize[1], window_width, window_height);
+		var offsetString =  offset[0]+ 'px ' + offset[1] + 'px'
+		$(obj).css('background-position', offsetString);
+		*/
+
 		if(cover_window){
-			var offset = getAdaptedBackgroundOffset(backgroundSize[0], backgroundSize[1]);
-			var offsetString =  offset[0]+ 'px ' + offset[1] + 'px'
-			$(obj).css('background-position', offsetString);
 			$(obj).css('background-attachment', 'fixed'); 
 		} else {
 			$(obj).css('background-attachment', 'initial'); 
@@ -686,11 +738,11 @@ function getAdaptedBackgroundSize(image, window_width, window_height){
 	return [required_image_width, required_image_height]
 }
 
-function getAdaptedBackgroundOffset(required_image_width, required_image_height){
+function getAdaptedBackgroundOffset(required_image_width, required_image_height, window_width, window_height){
 	var required_image_offset_x ;
 	var required_image_offset_y ;
-	var difference_height = parseInt(window.innerHeight) - required_image_height;
-	var difference_width= parseInt(window.innerWidth) - required_image_width;
+	var difference_height = window_height - required_image_height;
+	var difference_width= window_width - required_image_width;
 	required_image_offset_x = difference_width/2;
 	required_image_offset_y = difference_height/2;	
 	return [required_image_offset_x, required_image_offset_y]
