@@ -55,7 +55,8 @@ function compare_contents_areas(a, b) {
 }
 
 function building_structure_with_custom_start(root) {
-	contents_without_Coucool = [{id:'Participations', area:50},
+	contents_without_Coucool = [
+				{id:'Participations', area:50},
 				{id:'Infos', area:15},
 				{id:'Benevoles', area:15},
 				{id:'Principes', area:10},
@@ -118,28 +119,20 @@ function building_structure_with_custom_start(root) {
 		building_structure_from_contents(struct_coucool.getComplementary(root), contents_without_Coucool_and_participations);
 		//building_structure_from_contents(root, contents)
 	}
-	console.log(root);
 	// This is the rest of the contents 
 }
 
 
 function building_structure_from_contents(root, contents){
-	// var contents_array = Object.keys(contents).map(function (key) { return {'key':key, 'size':; });
 	// In the complex version we pick randomly two contents to create a structure that contains those 2 contents than
-	
-	// Simplest version where we order the area and split recursively the structure to obtain the area we are looking for
+	// Simplest version here where we order the area and split recursively the structure to obtain the area we are looking for
 	var ordered_contents = contents.sort(compare_contents_areas);
-	console.log(ordered_contents);
-	
 	j = 0 
 	var leave_to_insert = root;
 	var position = pickInArray(positions);
 	for ( var j = 0 ; j < ordered_contents.length; j++ ) {
 		var content = ordered_contents[j];
 		var struct_with_content;
-
-		console.log(content);
-		console.log(leave_to_insert.getArea(root));
 		if(j < ordered_contents.length-1) {
 			position = alternate(position);
 			struct_with_content = new Structure ({
@@ -153,9 +146,7 @@ function building_structure_from_contents(root, contents){
 			struct_with_content = leave_to_insert
 		}
 		struct_with_content.contents = content;
-
 		if(content.contents && content.contents.length > 0) {
-			console.log('we are in');
 			struct_with_content.aggregate = true;
 			building_structure_from_contents(struct_with_content, content.contents);
 		}
@@ -181,17 +172,6 @@ function building_random_structure_with_content(root, contents){
 		leaveToInsert.insert(struct);
 	}
 }
-				
-/*
-var contents = [$("#Coucool"),
-			$("#Participations"),
-			$("#Infos"),
-			$("#Benevoles"),
-			$("#Principes"),
-			$("#Curiosites"),
-			$("#Eros"),
-			$("#Definitions")];
-*/
 
 var positions = ["left", "right", "top", "bottom"];
 var polling_delay = 1;
@@ -239,10 +219,14 @@ var mondrian = {
 	initialStructure : {},
 	structure : {},
 	frame : $('#frame'),
-	contents : [],
 	focusedId : null,
+	allow_unfocus_on_mouse_leave : true,
+	allow_focus_on_mouse_enter : true,
 	updateRequired : true,
 	structure_drawn : false,
+	focusedHeight : 0,
+	focusedWidth : 0,
+
 
 	create_initial_structure : function() {
 		var root = new Structure();
@@ -263,6 +247,16 @@ var mondrian = {
 			mondrian.render();
 		}, polling_delay); //requestAnimationFrame( render );
 		adjust_background_sizes(true);
+		if(!mondrian.allow_unfocus_on_mouse_leave && !mondrian.is_focused_full_frame(0.8) ) {
+			console.log("allowing unfocus")
+		}
+		if(mondrian.allow_unfocus_on_mouse_leave && mondrian.is_focused_full_frame(0.8) ) {
+			console.log("not allowing unfocus")
+		}
+		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
+
+		//this.setFocusId(mondrian.structure.getByContentsId(getContentIdFromUrl)[0].id);
+		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
 		if (mondrian.updateRequired) {
 			mondrian.update();
 		}
@@ -285,8 +279,8 @@ var mondrian = {
 
 	animate : function() {
 		$(".endBox, .aggregate").click(focus);
-		$(".endBox, .aggregate").mouseenter(focus);
-		$(".endBox, .aggregate").mouseleave(unfocus);
+		$(".endBox, .aggregate").mouseenter(on_mouse_enter);
+		$(".endBox, .aggregate").mouseleave(on_mouse_leave);
 	},
 
 	requireUpdate : function() {
@@ -297,6 +291,7 @@ var mondrian = {
 		if (this.focusedId != id) {
 			if(id != null) {
 				this.focusedId = id;
+				document.location.href = "#" + this.structure.getById(id).contents.id ;
 				this.structure.getById(id).setAggregate(false);
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
 			} else {
@@ -305,7 +300,43 @@ var mondrian = {
 				this.requireUpdate();
 			}
 		}
-	}
+	},
+
+	unfocus : function(force = false) {
+		if (force) {
+			//mondrian.allow_focus_on_mouse_enter = false;
+		}
+		mondrian.setFocusId(null);
+	},
+
+	//Animation events aren't fired well so those are hacks to identify the view state
+	is_focused_full_frame : function (full_frame_ratio){
+		if (this.focusedId) {
+			//console.log($("#" + this.focusedId).width());
+			var longEnough = $("#" + this.focusedId).width() >= $('#frame').width() * full_frame_ratio ;
+			var largeEnough = $("#" + this.focusedId).height() >= $('#frame').height()* full_frame_ratio;
+			var isFullFrame = longEnough && largeEnough;
+			return isFullFrame
+		}
+		return false
+	},
+
+	/*
+	is_moving : function (){
+		focusedHeight = 0;
+		if (this.focusedId &&
+			this.focusedHeight != $(this.focusedId).height() || this.focusedWidth != $(this.focusedId).width()) {
+			this.focusedHeight = $(this.focusedId).height();
+			this.focusedWidth = $(this.focusedId).width();
+			return true
+		}
+		return false
+	},
+
+	is_back_to_main : function (){
+		return !this.is_focused_full_frame && !this.is_moving();
+	},
+	*/
 }
 
 function Structure(obj) {
@@ -408,20 +439,6 @@ Structure.prototype.setAggregate = function(value) {
 	}
 };
 
-Structure.prototype.increase = function() {
-	var id = this.id;
-
-	this.size = this.size+1;
-	this.getComplementary(mondrian.structure).size = (100 - this.size - 1);
-	if (this.id != mondrian.structure.id && this.size < 100) {
-		setTimeout(function(){
-			mondrian.structure.getById(id).increase()
-		}, polling_delay*20);
-	}
-	mondrian.requireUpdate();
-};
-
-
 Structure.prototype.applyAllParents = function(root, callback, post=false) {
 	if (post) {
 		if(this.getParent(root)){
@@ -512,15 +529,94 @@ function updateBoxFromStruct(struct, parentBox) {
 $(document).ready(function () {
 	mondrian.init_structure();
 	mondrian.render();
-	
-
-	//adjust_background_sizes();
-
-	//building_structure_from_contents(root_test, contents);
-	//$('#frame').append($("<div></div>"))
-
 });
 
+
+
+
+
+
+
+//////// CONTROLLER
+
+function on_mouse_enter() {
+	if( mondrian.allow_focus_on_mouse_enter &&
+		$(this).find(".content").attr('class').indexOf('static') < 0){
+		mondrian.setFocusId($(this).attr('id'));
+	}
+}
+
+function on_mouse_leave() {
+	if(mondrian.allow_unfocus_on_mouse_leave){
+		mondrian.unfocus();
+	}
+}
+
+function setUrl(location) {
+	if (location != getContentIdFromUrl()) {
+		document.location.href = "#" + location ;
+		mondrian.requireUpdate();
+	} else {
+		mondrian.unfocus()
+	}
+}
+
+function getContentIdFromUrl(){
+	var temp = document.URL.lastIndexOf("#");
+	if(temp !== -1){
+		pageName = document.URL.substring(temp + 1, document.URL.length);
+		return pageName
+	}
+	return ""
+}
+
+/*
+function setUrl(location) {
+	if (location != getContentIdFromUrl()) {
+		document.location.href = "#" + location ;
+		goToUrl();
+	} else {
+		mondrian.unfocus()
+	}
+}
+
+function goToUrl(){	
+		console.log("goToUrl");
+		var contentId = getContentIdFromUrl();
+
+		if (contentId == "") {
+			clearAllEndBoxes();
+			addMotion();
+		} else if (contentId == "Coucool" && !do_intro){
+			clearAllEndBoxes();
+			addMotion();
+		} else {
+			var $index_endBox = $("#"+ getContentIdFromUrl()).parent();
+			removeMotion();
+			setIncreasingEndBox($index_endBox);
+			setTimeout(addMotion, 50);
+		}
+		render();
+	}
+*/
+
+
+
+
+
+
+
+
+
+/*
+Here we want to set how the urls work.
+*/
+
+
+
+
+
+// FOR THE BACKGROUNDS
 $(window).resize(function () {
 	adjust_background_sizes();
 });
@@ -577,47 +673,33 @@ function getAdaptedBackgroundSize(image, window_width, window_height){
 	var ratio_window = window_width/ window_height;
 	var required_image_width ;
 	var required_image_height ;
-
 	if (ratio_window > ratio_image) {
-			// Here the height of the canvas will be longer
 			required_image_width  = window_width;
 			required_image_height = window_width/ratio_image;
 		} else {
 			required_image_height = window_height;
 			required_image_width = window_height * ratio_image ;
 		}
-
 	return [required_image_width, required_image_height]
 }
 
 function getAdaptedBackgroundOffset(required_image_width, required_image_height){
-	//To do retrieve this function from previous work
 	var required_image_offset_x ;
 	var required_image_offset_y ;
-	
-	// To have it centered 
 	var difference_height = parseInt(window.innerHeight) - required_image_height;
 	var difference_width= parseInt(window.innerWidth) - required_image_width;
 	required_image_offset_x = difference_width/2;
-	required_image_offset_y = difference_height/2;
-	
-	console.log(required_image_offset_x);
-	
+	required_image_offset_y = difference_height/2;	
 	return [required_image_offset_x, required_image_offset_y]
 }
 
 
-//////// CONTROLLER
 
-function focus() {
-	if($(this).find(".content").attr('class').indexOf('static') < 0){
-		mondrian.setFocusId($(this).attr('id'));
-	}
-}
 
-function unfocus() {
-	mondrian.setFocusId(null);
-}
+
+
+
+
 /*
  
 Structure.prototype.listChildrenIds = function(id) { 
@@ -647,6 +729,20 @@ Structure.prototype.applyInternalChildren = function(callback) {
 		}
 	}
 }
+
+
+Structure.prototype.increase = function() {
+	var id = this.id;
+	this.size = this.size+1;
+	this.getComplementary(mondrian.structure).size = (100 - this.size - 1);
+	if (this.id != mondrian.structure.id && this.size < 100) {
+		setTimeout(function(){
+			mondrian.structure.getById(id).increase()
+		}, polling_delay*20);
+	}
+	mondrian.requireUpdate();
+};
+
 
 
 $( ".box" )
