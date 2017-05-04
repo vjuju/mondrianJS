@@ -247,16 +247,9 @@ var mondrian = {
 			mondrian.render();
 		}, polling_delay); //requestAnimationFrame( render );
 		adjust_background_sizes(true);
-		if(!mondrian.allow_unfocus_on_mouse_leave && !mondrian.is_focused_full_frame(0.8) ) {
-			console.log("allowing unfocus")
-		}
-		if(mondrian.allow_unfocus_on_mouse_leave && mondrian.is_focused_full_frame(0.8) ) {
-			console.log("not allowing unfocus")
-		}
 		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
-
-		//this.setFocusId(mondrian.structure.getByContentsId(getContentIdFromUrl)[0].id);
 		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
+		mondrian.focusContents(getContentIdFromUrl());
 		if (mondrian.updateRequired) {
 			mondrian.update();
 		}
@@ -296,9 +289,19 @@ var mondrian = {
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
 			} else {
 				this.focusedId = null;
+				document.location.href = "#";
 				this.structure = this.initialStructure.clone();
 				this.requireUpdate();
 			}
+		}
+	},
+
+	focusContents : function(contentsId) {
+		var struct_to_focus = mondrian.structure.getByContentsId(contentsId);
+		if (struct_to_focus.length > 0) {
+			this.setFocusId(struct_to_focus[0].id);
+		} else {
+			this.setFocusId(null);
 		}
 	},
 
