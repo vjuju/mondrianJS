@@ -24,7 +24,7 @@
 //var NB_BOXES = 5;
 
 var BORDER_SIZE = 7;
-
+var DETAILS_FADE_IN_DELAY = 200;
 /*
 
 
@@ -257,11 +257,9 @@ var mondrian = {
 	focusedId : null,
 	allow_unfocus_on_mouse_leave : true,
 	allow_focus_on_mouse_enter : true,
+	show_focused_details : false,
 	updateRequired : true,
 	structure_drawn : false,
-	focusedHeight : 0,
-	focusedWidth : 0,
-
 
 	create_initial_structure : function() {
 		var root = new Structure();
@@ -283,7 +281,11 @@ var mondrian = {
 		}, polling_delay); //requestAnimationFrame( render );
 		//adjust_static_background_sizes();
 		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
+
+		//Not really the right way to do that but
+		mondrian.setShowFocusedDetails(mondrian.is_focused_full_frame(0.8));
 		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
+
 		mondrian.focusContents(getContentIdFromUrl());
 		if (mondrian.updateRequired) {
 			mondrian.update();
@@ -319,8 +321,9 @@ var mondrian = {
 		if (this.focusedId != id) {
 			if(id != null) {
 				this.focusedId = id;
+				console.log(this.structure.getById(id));
 				document.location.href = "#" + this.structure.getById(id).contents.id ;
-				this.structure.getById(id).setAggregate(false);
+				//this.structure.getById(id).setAggregate(false);
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
 			} else {
 				this.focusedId = null;
@@ -328,6 +331,13 @@ var mondrian = {
 				this.structure = this.initialStructure.clone();
 				this.requireUpdate();
 			}
+		}
+	},
+
+	setShowFocusedDetails : function(value) {
+		if (this.show_focused_details != value) {
+			this.show_focused_details != value
+			this.structure.getById(this.focusedId).setShowDetails(value);
 		}
 	},
 
@@ -357,24 +367,7 @@ var mondrian = {
 			return isFullFrame
 		}
 		return false
-	},
-
-	/*
-	is_moving : function (){
-		focusedHeight = 0;
-		if (this.focusedId &&
-			this.focusedHeight != $(this.focusedId).height() || this.focusedWidth != $(this.focusedId).width()) {
-			this.focusedHeight = $(this.focusedId).height();
-			this.focusedWidth = $(this.focusedId).width();
-			return true
-		}
-		return false
-	},
-
-	is_back_to_main : function (){
-		return !this.is_focused_full_frame && !this.is_moving();
-	},
-	*/
+	}
 }
 
 function Structure(obj) {
@@ -384,6 +377,7 @@ function Structure(obj) {
 	this.color = (obj && obj.color) ? obj.color : 'white';
 	this.contents = (obj && obj.contents) ? obj.contents : null;
 	this.aggregate = (obj && obj.aggregate) ? obj.aggregate : false;
+	this.show_details = (obj && obj.show_details) ? obj.show_details : false;
 	//this.parent = parent ? parent : null; // we create here a circular structure
 	this.child1 = (obj && obj.child1) ? new Structure(obj.child1) : null;
 	this.child2 = (obj && obj.child2) ? new Structure(obj.child2) : null;
@@ -477,6 +471,13 @@ Structure.prototype.setAggregate = function(value) {
 	}
 };
 
+Structure.prototype.setShowDetails = function(value) {
+	if (this.show_details != value) {
+		this.show_details = value;
+		mondrian.requireUpdate();
+	}
+};
+
 Structure.prototype.applyAllParents = function(root, callback, post=false) {
 	if (post) {
 		if(this.getParent(root)){
@@ -552,8 +553,19 @@ function setBox(box,struct){
 	box.attr("id",struct.id);
 	if (struct.aggregate) {
 		box.addClass('aggregate');
+		//box.find(".innerBox").css('display','block');
+	} 
+	var $closeButton = $("#closeButton");
+	if (struct.show_details) {		
+		box.append($closeButton);
+		$closeButton.show();
+		box.find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
+		//box.find(".details").css('display','block');
 	} else {
-		box.removeClass('aggregate');
+		box.find("#closeButton").hide();
+		//$closeButton.hide();
+		box.find(".details").fadeOut(DETAILS_FADE_IN_DELAY);
+		//box.find(".details").css('display','none');
 	}
 }
 
