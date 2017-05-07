@@ -327,7 +327,10 @@ var mondrian = {
 				console.log(this.structure.getById(id));
 				document.location.href = "#" + this.structure.getById(id).contents.id ;
 				//this.structure.getById(id).setAggregate(false);
-				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {struct.setSize(100);});
+				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {
+					struct.setSize(100);
+					struct.setAggregate(false);
+				});
 			} else {
 				this.focusedId = null;
 				document.location.href = "#";
