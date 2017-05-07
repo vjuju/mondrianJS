@@ -308,9 +308,10 @@ var mondrian = {
 	},
 
 	animate : function() {
-		$(".endBox, .aggregate").click(focus);
-		$(".endBox, .aggregate").mouseenter(on_mouse_enter);
-		$(".endBox, .aggregate").mouseleave(on_mouse_leave);
+		$(".endBox").click(on_mouse_enter);
+		$(".aggregate").click(on_mouse_enter);
+		//$(".endBox, .aggregate").mouseenter(on_mouse_enter);
+		//$(".endBox, .aggregate").mouseleave(on_mouse_leave);
 	},
 
 	requireUpdate : function() {
@@ -319,6 +320,8 @@ var mondrian = {
 
 	setFocusId : function(id) {
 		if (this.focusedId != id) {
+			console.log("Setfocus");
+			console.log(id);
 			if(id != null) {
 				this.focusedId = id;
 				console.log(this.structure.getById(id));
@@ -336,8 +339,20 @@ var mondrian = {
 
 	setShowFocusedDetails : function(value) {
 		if (this.show_focused_details != value) {
-			this.show_focused_details != value
-			this.structure.getById(this.focusedId).setShowDetails(value);
+			this.show_focused_details = value;
+			console.log(value);
+			if (value) {
+				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
+			} else {
+				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
+			}
+			if(this.focusedId && this.structure.getById(this.focusedId)) {
+				if(this.structure.getById(this.focusedId).aggregate == false) {
+					this.structure.getById(this.focusedId).setShowDetails(value);
+				} else {
+					this.structure.getById(this.focusedId).setAggregate(!value);
+				}
+			}
 		}
 	},
 
@@ -346,15 +361,18 @@ var mondrian = {
 		if (struct_to_focus.length > 0) {
 			this.setFocusId(struct_to_focus[0].id);
 		} else {
+			//console.log("inFocusContent");
 			this.setFocusId(null);
 		}
 	},
 
 	unfocus : function(force = false) {
-		if (force) {
+		if (!force && this.focusedId && this.structure.getById(this.focusedId).aggregate) {
 			//mondrian.allow_focus_on_mouse_enter = false;
+		} else {
+			console.log("inUnfocus");
+			mondrian.setFocusId(null);
 		}
-		mondrian.setFocusId(null);
 	},
 
 	//Animation events aren't fired well so those are hacks to identify the view state
@@ -549,20 +567,23 @@ function createBoxFromStruct(struct, parentBox) {
 function setBox(box,struct){
 	var attributeToApplySize = (struct.position == "bottom" || struct.position == "top") ? 'height' : 'width';
 	box.css(attributeToApplySize, struct.size + "%");
+
 	box.addClass(struct.position);
 	box.attr("id",struct.id);
 	if (struct.aggregate) {
 		box.addClass('aggregate');
 		//box.find(".innerBox").css('display','block');
-	} 
+	} else {
+		box.removeClass('aggregate');
+		box.off();
+	}
+
 	var $closeButton = $("#closeButton");
-	if (struct.show_details) {		
-		box.append($closeButton);
-		$closeButton.show();
+	if (struct.show_details) {	
+		console.log(box)	
 		box.find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
 		//box.find(".details").css('display','block');
 	} else {
-		box.find("#closeButton").hide();
 		//$closeButton.hide();
 		box.find(".details").fadeOut(DETAILS_FADE_IN_DELAY);
 		//box.find(".details").css('display','none');
@@ -582,8 +603,13 @@ function updateBoxFromStruct(struct, parentBox) {
 
 $(document).ready(function () {
 	mondrian.init_structure();
-	mondrian.focusContents("Coucool");
-	setTimeout(function(){mondrian.setFocusId(null)}, 2000);
+	if(getContentIdFromUrl() != ""){
+		mondrian.focusContents(getContentIdFromUrl());
+	} else {
+		mondrian.focusContents("Coucool");
+		setTimeout(function(){mondrian.setFocusId(null)}, 2000);
+	}
+	adjust_background_sizes();
 	mondrian.render();
 });
 
@@ -595,6 +621,8 @@ $(document).ready(function () {
 function on_mouse_enter() {
 	if( mondrian.allow_focus_on_mouse_enter &&
 		$(this).find(".content").attr('class').indexOf('static') < 0){
+		console.log("inMouseEnter");
+		console.log($(this).attr('id'));
 		mondrian.setFocusId($(this).attr('id'));
 	}
 }
@@ -605,14 +633,17 @@ function on_mouse_leave() {
 	}
 }
 
+/*
 function setUrl(location) {
 	if (location != getContentIdFromUrl()) {
 		document.location.href = "#" + location ;
 		mondrian.requireUpdate();
 	} else {
+		console.log("inSetUrl");
 		mondrian.unfocus()
 	}
 }
+*/
 
 function getContentIdFromUrl(){
 	var temp = document.URL.lastIndexOf("#");
