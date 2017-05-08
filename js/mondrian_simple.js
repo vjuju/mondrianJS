@@ -283,7 +283,7 @@ var mondrian = {
 		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
 
 		//Not really the right way to do that but
-		mondrian.setShowFocusedDetails(mondrian.is_focused_full_frame(0.8));
+		mondrian.setShowFocusedDetails(mondrian.is_focused_full_frame(0.8) && getContentIdFromUrl()!="Coucool");
 		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
 
 		mondrian.focusContents(getContentIdFromUrl());
@@ -308,10 +308,10 @@ var mondrian = {
 	},
 
 	animate : function() {
-		$(".endBox").click(on_mouse_enter);
-		$(".aggregate").click(on_mouse_enter);
-		//$(".endBox, .aggregate").mouseenter(on_mouse_enter);
-		//$(".endBox, .aggregate").mouseleave(on_mouse_leave);
+		//$(".endBox").click(on_mouse_enter);
+		//$(".aggregate").click(on_mouse_enter);
+		$(".endBox, .aggregate").mouseenter(on_mouse_enter);
+		$(".endBox, .aggregate").mouseleave(on_mouse_leave);
 	},
 
 	requireUpdate : function() {
@@ -344,17 +344,13 @@ var mondrian = {
 		if (this.show_focused_details != value) {
 			this.show_focused_details = value;
 			console.log(value);
-			if (value) {
+			if (value) { 
 				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 			} else {
 				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
 			}
 			if(this.focusedId && this.structure.getById(this.focusedId)) {
-				if(this.structure.getById(this.focusedId).aggregate == false) {
-					this.structure.getById(this.focusedId).setShowDetails(value);
-				} else {
-					this.structure.getById(this.focusedId).setAggregate(!value);
-				}
+				this.structure.getById(this.focusedId).setShowDetails(value);
 			}
 		}
 	},
@@ -580,15 +576,13 @@ function setBox(box,struct){
 		box.removeClass('aggregate');
 		box.off();
 	}
-
-	var $closeButton = $("#closeButton");
 	if (struct.show_details) {	
 		console.log(box)	
-		box.find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
+		box.find("> .innerBox").find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
 		//box.find(".details").css('display','block');
 	} else {
 		//$closeButton.hide();
-		box.find(".details").fadeOut(DETAILS_FADE_IN_DELAY);
+		box.find("> .innerBox").find(".details").fadeOut(DETAILS_FADE_IN_DELAY);
 		//box.find(".details").css('display','none');
 	}
 }
@@ -636,8 +630,11 @@ function on_mouse_leave() {
 	}
 }
 
-/*
 function setUrl(location) {
+	document.location.href = "#" + location ;
+	mondrian.requireUpdate();
+
+	/*
 	if (location != getContentIdFromUrl()) {
 		document.location.href = "#" + location ;
 		mondrian.requireUpdate();
@@ -645,8 +642,8 @@ function setUrl(location) {
 		console.log("inSetUrl");
 		mondrian.unfocus()
 	}
+	*/
 }
-*/
 
 function getContentIdFromUrl(){
 	var temp = document.URL.lastIndexOf("#");
