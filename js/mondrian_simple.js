@@ -344,7 +344,8 @@ var mondrian = {
 		if (this.show_focused_details != value) {
 			this.show_focused_details = value;
 			console.log(value);
-			if (value) { 
+			if (value && this.focusedId) { 
+				$("#"+ this.focusedId).append($("#closeButton"))
 				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 			} else {
 				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
