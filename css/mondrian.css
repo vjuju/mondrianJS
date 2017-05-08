@@ -1,5 +1,12 @@
 @font-face { font-family: 'Josefin';       src:url('../fonts/JosefinSans-Regular.ttf'); }
 
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+    -ms-overflow-style: none;
+}
+
 body {
     background-color: white;
     font-family: 'Josefin'; 
@@ -7,9 +14,29 @@ body {
     overflow: auto;
     height: 100%;
     width: 100%;
+     -webkit-overflow-scrolling: touch;
+    font-family: 'Josefin'; 
+    /*font-size: 24px;*/
+    color: rgb(33,34,160);
+    overflow: hidden;
     /*text-shadow: 2px 2px #ff0000;*/
 }
 
+::-moz-scrollbar { 
+    display: none; 
+}
+
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+.content::-webkit-scrollbar { 
+    display: none;  // Safari and Chrome
+}
+
+.content::-moz-scrollbar { 
+    display: none;  // Safari and Chrome
+}
 
 /* Structure */
 
@@ -49,6 +76,8 @@ body {
     background-origin: 0px 0px;
 	background-repeat: no-repeat;
 	background-size: 0px 0px;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
 }
 
 .artwork {

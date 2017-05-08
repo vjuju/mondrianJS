@@ -112,11 +112,6 @@ function building_structure_with_custom_start(root) {
 		requested_height_coucool = width_coucool/image_ratio;
 		size_coucool = (requested_height_coucool + 2 * BORDER_SIZE) / (window_height) * 100;
 
-		console.log(window_width);
-		console.log(width_coucool);
-		console.log(requested_height_coucool);
-		console.log(size_coucool);
-
 		struct_coucool = new Structure ({
 					'position' : position_coucool,
 					'size' : size_coucool,
@@ -320,11 +315,8 @@ var mondrian = {
 
 	setFocusId : function(id) {
 		if (this.focusedId != id) {
-			console.log("Setfocus");
-			console.log(id);
 			if(id != null) {
 				this.focusedId = id;
-				console.log(this.structure.getById(id));
 				document.location.href = "#" + this.structure.getById(id).contents.id ;
 				//this.structure.getById(id).setAggregate(false);
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {
@@ -343,9 +335,15 @@ var mondrian = {
 	setShowFocusedDetails : function(value) {
 		if (this.show_focused_details != value) {
 			this.show_focused_details = value;
-			console.log(value);
-			if (value && this.focusedId) { 
-				$("#"+ this.focusedId).append($("#closeButton"))
+			if (value && this.focusedId) {
+				/* 
+				if (this.focusedId) {
+					$("#"+ this.focusedId).append($("#closeButton"));
+				} else {
+					$("body").append($("#closeButton"));
+				}
+				*/
+				$("#"+ this.focusedId).append($("#closeButton"));
 				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 			} else {
 				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
@@ -367,12 +365,14 @@ var mondrian = {
 	},
 
 	unfocus : function(force = false) {
+		mondrian.setFocusId(null);
+		/*
 		if (!force && this.focusedId && this.structure.getById(this.focusedId).aggregate) {
 			//mondrian.allow_focus_on_mouse_enter = false;
 		} else {
-			console.log("inUnfocus");
 			mondrian.setFocusId(null);
 		}
+		*/
 	},
 
 	//Animation events aren't fired well so those are hacks to identify the view state
@@ -547,7 +547,7 @@ Structure.prototype.listChildrenLeavesIds = function(id) {
 function createBoxFromStruct(struct, parentBox) {
 	var box = $("<div class='box transition endBox'></div>");
 	var innerBox = $("<div class='innerBox'></div>");
-	innerBox.css("background-color", struct.color);
+	//innerBox.css("background-color", struct.color);
 	innerBox.css('top', BORDER_SIZE + 'px'); 
 	innerBox.css('bottom', BORDER_SIZE + 'px'); 
 	innerBox.css('right', BORDER_SIZE + 'px'); 
@@ -577,8 +577,7 @@ function setBox(box,struct){
 		box.removeClass('aggregate');
 		box.off();
 	}
-	if (struct.show_details) {	
-		console.log(box)	
+	if (struct.show_details) {		
 		box.find("> .innerBox").find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
 		//box.find(".details").css('display','block');
 	} else {
@@ -609,6 +608,7 @@ $(document).ready(function () {
 	}
 	adjust_background_sizes();
 	mondrian.render();
+	$.getScript("./js/jquery.touchSwipe.min.js" );
 });
 
 
@@ -619,8 +619,6 @@ $(document).ready(function () {
 function on_mouse_enter() {
 	if( mondrian.allow_focus_on_mouse_enter &&
 		$(this).find(".content").attr('class').indexOf('static') < 0){
-		console.log("inMouseEnter");
-		console.log($(this).attr('id'));
 		mondrian.setFocusId($(this).attr('id'));
 	}
 }
