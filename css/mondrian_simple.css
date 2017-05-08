@@ -197,6 +197,10 @@ body {
     display: none;
 }
 
+.details.stay {
+    display: block;
+}
+
 
 @media (max-width: 763px) {
     .header {      
