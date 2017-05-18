@@ -55,6 +55,7 @@ function compare_contents_areas(a, b) {
 }
 
 function building_structure_with_custom_start(root) {
+	/*
 	contents_without_Coucool = [
 				{id:'Participations', area:50},
 				{id:'Infos', area:15},
@@ -78,6 +79,26 @@ function building_structure_with_custom_start(root) {
 					{id:'Liens', area:50}
 					]
 				}
+				];
+	*/
+
+		contents_without_Coucool = [
+				{id:'Participations', area:50},
+				{id:'Infos', area:15},
+				{id:'Benevoles', area:15},
+				{id:'Principes', area:10},
+				{id:'Curiosites', area:10},
+				{id:'Eros', area:0},
+				{id:'Definitions', area:0}
+				];
+	
+	contents_without_Coucool_and_participations = [
+				{id:'Infos', area:30},
+				{id:'Benevoles', area:30},
+				{id:'Principes', area:20},
+				{id:'Curiosites', area:20},
+				{id:'Eros', area:0},
+				{id:'Definitions', area:0}
 				];
 	
 	var image_ratio = 1.8046499873641648; //image.width/image.height;
@@ -172,6 +193,8 @@ function building_structure_from_contents(root, contents){
 					})
 			leave_to_insert.insert(struct_with_content);
 			leave_to_insert = struct_with_content.getComplementary(root);
+			console.log(struct_with_content)
+			console.log(leave_to_insert)
 		} else {
 			struct_with_content = leave_to_insert
 		}
@@ -204,7 +227,7 @@ function building_random_structure_with_content(root, contents){
 }
 
 var positions = ["left", "right", "top", "bottom"];
-var polling_delay = 1;
+var polling_delay = 50;
 
 function pickInArray(array) {
 		return array[Math.floor(Math.random() * (array.length))]
@@ -322,7 +345,7 @@ var mondrian = {
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {
 					struct.setSize(100);
 					struct.setAggregate(false);
-				});
+				}, false);
 			} else {
 				this.focusedId = null;
 				document.location.href = "#";
@@ -343,7 +366,7 @@ var mondrian = {
 					$("body").append($("#closeButton"));
 				}
 				*/
-				$("#"+ this.focusedId).append($("#closeButton"));
+				$("#"+ this.focusedId).find("> .innerBox").find(".content").append($("#closeButton"));
 				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 			} else {
 				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
@@ -364,7 +387,7 @@ var mondrian = {
 		}
 	},
 
-	unfocus : function(force = false) {
+	unfocus : function() {
 		mondrian.setFocusId(null);
 		/*
 		if (!force && this.focusedId && this.structure.getById(this.focusedId).aggregate) {
@@ -391,7 +414,7 @@ var mondrian = {
 function Structure(obj) {
 	this.id = (obj && obj.id) ? obj.id : "0";
 	this.position = (obj && obj.position) ? obj.position : "top";
-	this.size = (obj && obj.size) ? obj.size : 100;
+	this.size = (obj && obj.size >= 0) ? obj.size : 100;
 	this.color = (obj && obj.color) ? obj.color : 'white';
 	this.contents = (obj && obj.contents) ? obj.contents : null;
 	this.aggregate = (obj && obj.aggregate) ? obj.aggregate : false;
@@ -496,7 +519,7 @@ Structure.prototype.setShowDetails = function(value) {
 	}
 };
 
-Structure.prototype.applyAllParents = function(root, callback, post=false) {
+Structure.prototype.applyAllParents = function(root, callback, post) {
 	if (post) {
 		if(this.getParent(root)){
 			callback(this.getParent(root));
@@ -608,7 +631,6 @@ $(document).ready(function () {
 	}
 	adjust_background_sizes();
 	mondrian.render();
-	$.getScript("./js/jquery.touchSwipe.min.js" );
 });
 
 
@@ -706,6 +728,8 @@ $(window).resize(function () {
 
 $(window).load(function () {
 	adjust_background_sizes();
+	$.getScript("./js/jquery.touchSwipe.min.js" );
+	$.getScript("https://www.weezevent.com/js/widget/min/widget.min.js");
 });
 
 function adjust_background_sizes(){
