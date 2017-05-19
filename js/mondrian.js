@@ -3,16 +3,12 @@
 // A Mondrian structure can be seen as a full binary tree where each node is a box, leaves are endBoxes
 // Each node of the binary tree has two attributes :
 - a position Left, Right, Bottom, Top
-- a initial size in percent 
+- a initial size in percent
+(- a color in the case of a Mondrian)
 // One elegant way to define a binary tree is to define an object
 // Here we see that with only one child we can define the other one
 // In our case the root is the only node with no
 // The size of two nodes issued from the same node should always be equal to 100
-
-
-
-// What could be interesting as well would be to be able to generate a Mondrian with the right areas
-// It isn't difficult, one simple way to do it is to order the value and generate 
 
 
 // For the navigation we need to introduce the notion of aggregate in the model
@@ -21,213 +17,23 @@
 
 */
 
-//var NB_BOXES = 5;
+
+/// VIEW SETTINGS
 
 var BORDER_SIZE = 7;
+var BORDER_COLOR = "white";
 var DETAILS_FADE_IN_DELAY = 200;
-/*
+var REFRESHING_RATE = 50;//in ms
+var NB_PAINTING_BOX = 20;
 
 
-*/
-
-
-
-
-var contents = [{id:'Coucool', area:34},
-				{id:'Participations', area:36},
-				{id:'Infos', area:10},
-				{id:'Benevoles', area:10},
-				{id:'Principes', area:5},
-				{id:'Curiosites', area:5,
-					contents: [{id:'Eros', area:25},
-					{id:'Definitions', area:25},
-					{id:'Liens', area:50}
-					]
-				}
-				]
-				
-var root_test = new Structure();
+/// HELPERS
 
 function compare_contents_areas(a, b) {
 	var number = b.area - a.area
 	var sign = number && number / Math.abs(number);
 	return sign
 }
-
-function building_structure_with_custom_start(root) {
-	/*
-	contents_without_Coucool = [
-				{id:'Participations', area:50},
-				{id:'Infos', area:15},
-				{id:'Benevoles', area:15},
-				{id:'Principes', area:10},
-				{id:'Curiosites', area:10,
-					contents: [{id:'Eros', area:25},
-					{id:'Definitions', area:25},
-					{id:'Liens', area:50}
-					]
-				}
-				];
-	
-	contents_without_Coucool_and_participations = [
-				{id:'Infos', area:30},
-				{id:'Benevoles', area:30},
-				{id:'Principes', area:20},
-				{id:'Curiosites', area:20,
-					contents: [{id:'Eros', area:25},
-					{id:'Definitions', area:25},
-					{id:'Liens', area:50}
-					]
-				}
-				];
-	*/
-
-		contents_without_Coucool = [
-				{id:'Participations', area:50},
-				{id:'Infos', area:15},
-				{id:'Benevoles', area:15},
-				{id:'Principes', area:10},
-				{id:'Curiosites', area:10},
-				{id:'Eros', area:0},
-				{id:'Definitions', area:0}
-				];
-	
-	contents_without_Coucool_and_participations = [
-				{id:'Infos', area:30},
-				{id:'Benevoles', area:30},
-				{id:'Principes', area:20},
-				{id:'Curiosites', area:20},
-				{id:'Eros', area:0},
-				{id:'Definitions', area:0}
-				];
-	
-	var image_ratio = 1.8046499873641648; //image.width/image.height;
-	var window_width = $("#frame").width();
-	var window_height = $("#frame").height();
-	var position_coucool, size_coucool, struct_coucool, struct_participations;
-	// If the width is too small, we want Coucool box to be the first one 
-	if(parseInt(window.innerWidth)<768) {
-		//var image = getImage($(".artwork").css('background-image')); We need the ratio before the load
-		position_coucool = pickInArray(["top","bottom"]);
-		size_coucool = (window_width/image_ratio)/window_height * 100;
-		struct_coucool = new Structure ({
-					'position' : position_coucool,
-					'size' : size_coucool,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
-					'contents' : {id:"Coucool", area:size_coucool}
-					})
-		root.insert(struct_coucool);	
-		building_structure_from_contents(struct_coucool.getComplementary(root), contents_without_Coucool)
-	} else {
-		// Let's assume 
-		var first_size = 60;
-		var first_struct = new Structure ({
-					'position' : pickInArray(["left","right"]),
-					'size' : first_size,
-					'color' : pickInArray(["yellow","pink","blue","green"])
-					})
-		root.insert(first_struct);
-
-		position_coucool = pickInArray(["top","bottom"]);
-		width_coucool = first_size * window_width / 100 - 2 * BORDER_SIZE;
-		requested_height_coucool = width_coucool/image_ratio;
-		size_coucool = (requested_height_coucool + 2 * BORDER_SIZE) / (window_height) * 100;
-
-		struct_coucool = new Structure ({
-					'position' : position_coucool,
-					'size' : size_coucool,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
-					'contents' : {id:"Coucool", area: size_coucool * first_size /100 }
-					})
-		first_struct.insert(struct_coucool);
-		struct_coucool.getComplementary(root).contents = {id:"Participations", area: (100-size_coucool) * first_size /100 };
-		struct_coucool.getComplementary(root).color = pickInArray(["yellow","pink","blue","green"]);
-		building_structure_from_contents(first_struct.getComplementary(root), contents_without_Coucool_and_participations);
-
-		/*
-		var size_participations = 30;
-		var position_participations = pickInArray(["left","right"])
-		struct_participations = new Structure ({
-					'position' : position_participations,
-					'size' : size_participations,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
-					'contents' : {id:"Participations", area:size_participations}
-					})
-		root.insert(struct_participations);
-		position_coucool = pickInArray(["top","bottom"]);
-		width_coucool = (100 - size_participations) * window_width - 2 * BORDER_SIZE;
-		requested_height_coucool = width_coucool/image_ratio;
-		size_coucool = (requested_height_coucool + 2 * BORDER_SIZE) / (window_height - 2 * BORDER_SIZE);
-		struct_coucool = new Structure ({
-					'position' : position_coucool,
-					'size' : size_coucool,
-					'color' : pickInArray(["yellow","pink","blue","green"]),
-					'contents' : {id:"Coucool", area: size_coucool * (100-size_participations)/100 }
-					})
-		struct_participations.getComplementary(root).insert(struct_coucool);
-		building_structure_from_contents(struct_coucool.getComplementary(root), contents_without_Coucool_and_participations);
-		*/
-
-		//building_structure_from_contents(root, contents)
-	}
-	// This is the rest of the contents 
-}
-
-
-function building_structure_from_contents(root, contents){
-	// In the complex version we pick randomly two contents to create a structure that contains those 2 contents than
-	// Simplest version here where we order the area and split recursively the structure to obtain the area we are looking for
-	var ordered_contents = contents.sort(compare_contents_areas);
-	j = 0 
-	var leave_to_insert = root;
-	var position = pickInArray(positions);
-	for ( var j = 0 ; j < ordered_contents.length; j++ ) {
-		var content = ordered_contents[j];
-		var struct_with_content;
-		if(j < ordered_contents.length-1) {
-			position = alternate(position);
-			struct_with_content = new Structure ({
-					'position' : position,
-					'size' : content.area / (leave_to_insert.getArea(root)) * 100,
-					'color' : pickInArray(["yellow","pink","blue","green"])
-					})
-			leave_to_insert.insert(struct_with_content);
-			leave_to_insert = struct_with_content.getComplementary(root);
-			console.log(struct_with_content)
-			console.log(leave_to_insert)
-		} else {
-			struct_with_content = leave_to_insert
-		}
-		struct_with_content.contents = content;
-		if(content.contents && content.contents.length > 0) {
-			struct_with_content.aggregate = true;
-			building_structure_from_contents(struct_with_content, content.contents);
-		}
-	}
-}
-
-function building_random_structure_with_content(root, contents){
-	// Random with content
-	var contents_array = Object.keys(contents).map(function (key) { return key; });
-	for ( var j = 1 ; j < NB_BOXES; j++ ) {
-		var content = ( j < (contents.length + 1) ) ? contents[j-1] : null
-		//console.log(content);
-		var random_struct = {
-			'position' : pickInArray(positions),
-			'size' : pickAnIntegerBetween(40, 60),
-			'color' : pickInArray(["yellow","pink","blue","green"]),
-			'contents' : content
-			}
-		var struct = new Structure(random_struct); 
-		var leavesIds = root.listChildrenLeavesIds();
-		var leaveIdToInsert = pickInArray(leavesIds);
-		var leaveToInsert = root.getById(leaveIdToInsert);
-		leaveToInsert.insert(struct);
-	}
-}
-
-var positions = ["left", "right", "top", "bottom"];
-var polling_delay = 50;
 
 function pickInArray(array) {
 		return array[Math.floor(Math.random() * (array.length))]
@@ -236,6 +42,8 @@ function pickInArray(array) {
 function pickAnIntegerBetween(min, max) {
 		return Math.floor(Math.random()*(max-min+1)+min);
 }
+
+var positions = ["left", "right", "top", "bottom"];
 
 function opposite(position) {
 	switch(position) {
@@ -268,22 +76,39 @@ function complementaryId(id) {
 	return (id_trunk + complementary_character);
 }
 
+function getContentIdFromUrl(){
+	var temp = document.URL.lastIndexOf("#");
+	if(temp !== -1){
+		pageName = document.URL.substring(temp + 1, document.URL.length);
+		return pageName
+	}
+	return ""
+}
+
+function isContentFocusable(contentId){
+	var is_focusable = ($("#"+contentId).attr('class').indexOf('non_focusable') < 0);
+	return is_focusable
+}
+
+
+
 var mondrian = {
 	initialStructure : {},
 	structure : {},
 	frame : $('#frame'),
+	mode : "painting",
 	focusedId : null,
-	allow_unfocus_on_mouse_leave : true,
-	allow_focus_on_mouse_enter : true,
 	show_focused_details : false,
 	updateRequired : true,
 	structure_drawn : false,
 
 	create_initial_structure : function() {
 		var root = new Structure();
-		building_structure_with_custom_start(root)
-		//building_structure_from_contents(root, contents);
-		//building_random_structure_with_content(root, contents)
+		switch(this.mode) {
+		    case "custom": build_custom_structure(root); break
+		    case "painting": build_random_mondrian(root);  break
+		    case "contents_with_area" : build_structure_from_contents_with_areas(root); break
+		}
 		return root
 	},
 
@@ -293,18 +118,13 @@ var mondrian = {
 	},
 
 	render : function() {
-		// Need to find a way to pass "this" 
 		setTimeout(function(){
 			mondrian.render();
-		}, polling_delay); //requestAnimationFrame( render );
-		//adjust_static_background_sizes();
-		mondrian.allow_unfocus_on_mouse_leave = !mondrian.is_focused_full_frame(0.8);
-
-		//Not really the right way to do that but
-		mondrian.setShowFocusedDetails(mondrian.is_focused_full_frame(0.8) && getContentIdFromUrl()!="Coucool");
-		//if (mondrian.is_back_to_main()) { mondrian.allow_focus_on_mouse_enter = true }
-
-		mondrian.focusContents(getContentIdFromUrl());
+		}, REFRESHING_RATE); 
+		if (this.mode != "painting") {
+			mondrian.focusContents(getContentIdFromUrl());
+		}
+		mondrian.setShowFocusedDetails(mondrian.is_focused_full_frame(0.8));
 		if (mondrian.updateRequired) {
 			mondrian.update();
 		}
@@ -326,8 +146,6 @@ var mondrian = {
 	},
 
 	animate : function() {
-		//$(".endBox").click(on_mouse_enter);
-		//$(".aggregate").click(on_mouse_enter);
 		$(".endBox, .aggregate").mouseenter(on_mouse_enter);
 		$(".endBox, .aggregate").mouseleave(on_mouse_leave);
 	},
@@ -340,8 +158,10 @@ var mondrian = {
 		if (this.focusedId != id) {
 			if(id != null) {
 				this.focusedId = id;
-				document.location.href = "#" + this.structure.getById(id).contents.id ;
-				//this.structure.getById(id).setAggregate(false);
+				if(this.structure.getById(id).contents){
+					document.location.href = "#" + this.structure.getById(id).contents.id ;
+				}
+				this.structure.getById(id).setAggregate(false);
 				this.structure.getById(id).applyAllParents(mondrian.structure, function (struct) {
 					struct.setSize(100);
 					struct.setAggregate(false);
@@ -358,16 +178,16 @@ var mondrian = {
 	setShowFocusedDetails : function(value) {
 		if (this.show_focused_details != value) {
 			this.show_focused_details = value;
-			if (value && this.focusedId) {
-				/* 
-				if (this.focusedId) {
-					$("#"+ this.focusedId).append($("#closeButton"));
+			if (value && this.focusedId ) {
+				if(this.structure.getById(this.focusedId).contents) {
+					if (isContentFocusable(this.structure.getById(this.focusedId).contents.id)) {
+						$("#"+ this.focusedId).find("> .innerBox").find(".content").append($("#closeButton"));
+						$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
+					}
 				} else {
-					$("body").append($("#closeButton"));
+					$("#"+this.focusedId).append($("#closeButton"));
+					$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 				}
-				*/
-				$("#"+ this.focusedId).find("> .innerBox").find(".content").append($("#closeButton"));
-				$("#closeButton").fadeIn(DETAILS_FADE_IN_DELAY)
 			} else {
 				$("#closeButton").fadeOut(DETAILS_FADE_IN_DELAY) ;
 			}
@@ -382,26 +202,17 @@ var mondrian = {
 		if (struct_to_focus.length > 0) {
 			this.setFocusId(struct_to_focus[0].id);
 		} else {
-			//console.log("inFocusContent");
 			this.setFocusId(null);
 		}
 	},
 
 	unfocus : function() {
 		mondrian.setFocusId(null);
-		/*
-		if (!force && this.focusedId && this.structure.getById(this.focusedId).aggregate) {
-			//mondrian.allow_focus_on_mouse_enter = false;
-		} else {
-			mondrian.setFocusId(null);
-		}
-		*/
 	},
 
 	//Animation events aren't fired well so those are hacks to identify the view state
 	is_focused_full_frame : function (full_frame_ratio){
 		if (this.focusedId) {
-			//console.log($("#" + this.focusedId).width());
 			var longEnough = $("#" + this.focusedId).width() >= $('#frame').width() * full_frame_ratio ;
 			var largeEnough = $("#" + this.focusedId).height() >= $('#frame').height()* full_frame_ratio;
 			var isFullFrame = longEnough && largeEnough;
@@ -467,8 +278,7 @@ Structure.prototype.equal = function(struct) {
 Structure.prototype.complementary = function() {
 	var complementary = {
 		'position' : opposite(this.position),
-		'size' : (100-this.size),
-		'color' : pickInArray(["yellow","pink","blue","green"])
+		'size' : (100-this.size)
 	}
 	return new Structure(complementary);
 };
@@ -560,17 +370,66 @@ Structure.prototype.isParent = function(id) {
 	return 	id.indexOf(this.id) == 0 
 }
 
-Structure.prototype.listChildrenLeavesIds = function(id) { 
+Structure.prototype.listEndLeavesIds = function(id) { 
 	var ids = [];
 	this.applyEndLeaves(function (struct) { ids.push(struct.id)});
 	return ids;
 }
 
+function build_structure_from_contents_with_areas(root, contents){
+	// TO DO : Complex version not ordered
+	// In the complex version we create a structure for each content, then pick randomly two of them to create a commun parent structure with the right area and adapt the size of the two children structure and do that recursively. A bit like in a dendogram
+	// Simplest version here where we order the area and split recursively the structure to obtain the area we are looking for
+	var ordered_contents = contents.sort(compare_contents_areas);
+	j = 0 
+	var leave_to_insert = root;
+	var position = pickInArray(positions);
+	for ( var j = 0 ; j < ordered_contents.length; j++ ) {
+		var content = ordered_contents[j];
+		var struct_with_content;
+		if(j < ordered_contents.length-1) {
+			position = alternate(position);
+			struct_with_content = new Structure ({
+					'position' : position,
+					'size' : content.area / (leave_to_insert.getArea(root)) * 100
+					})
+			leave_to_insert.insert(struct_with_content);
+			leave_to_insert = struct_with_content.getComplementary(root);
+			console.log(struct_with_content)
+			console.log(leave_to_insert)
+		} else {
+			struct_with_content = leave_to_insert
+		}
+		struct_with_content.contents = content;
+		if(content.contents && content.contents.length > 0) {
+			struct_with_content.aggregate = true;
+			build_structure_from_contents_with_areas(struct_with_content, content.contents);
+		}
+	}
+}
+
+function build_random_mondrian(root){
+	BORDER_COLOR = "black";
+	BORDER_SIZE = 4;
+	var leave_to_insert = root;
+	for ( var j = 0 ; j < NB_PAINTING_BOX; j++ ) {
+		var position = pickInArray(positions);
+		var struct_to_insert = new Structure ({
+				'position' : position,
+				'size' : pickAnIntegerBetween(20,80),
+				'color' : pickInArray(["white", "black", "red", "blue", "yellow"])
+				})
+		leave_to_insert.insert(struct_to_insert);
+		leave_to_insert = root.getById(pickInArray(root.listEndLeavesIds()));
+		console.log(leave_to_insert)
+	}
+}
 
 function createBoxFromStruct(struct, parentBox) {
 	var box = $("<div class='box transition endBox'></div>");
 	var innerBox = $("<div class='innerBox'></div>");
-	//innerBox.css("background-color", struct.color);
+	box.css("background-color", BORDER_COLOR);
+	innerBox.css("background-color", struct.color);
 	innerBox.css('top', BORDER_SIZE + 'px'); 
 	innerBox.css('bottom', BORDER_SIZE + 'px'); 
 	innerBox.css('right', BORDER_SIZE + 'px'); 
@@ -590,26 +449,20 @@ function createBoxFromStruct(struct, parentBox) {
 function setBox(box,struct){
 	var attributeToApplySize = (struct.position == "bottom" || struct.position == "top") ? 'height' : 'width';
 	box.css(attributeToApplySize, struct.size + "%");
-
 	box.addClass(struct.position);
 	box.attr("id",struct.id);
 	if (struct.aggregate) {
 		box.addClass('aggregate');
-		//box.find(".innerBox").css('display','block');
 	} else {
 		box.removeClass('aggregate');
 		box.off();
 	}
 	if (struct.show_details) {		
 		box.find("> .innerBox").find(".details").fadeIn(DETAILS_FADE_IN_DELAY);
-		//box.find(".details").css('display','block');
 	} else {
-		//$closeButton.hide();
 		box.find("> .innerBox").find(".details").fadeOut(DETAILS_FADE_IN_DELAY);
-		//box.find(".details").css('display','none');
 	}
 }
-
 
 function updateBoxFromStruct(struct, parentBox) {
 	var box = $("#"+struct.id);
@@ -619,34 +472,20 @@ function updateBoxFromStruct(struct, parentBox) {
 }
 
 
-////////// MAIN
-
-$(document).ready(function () {
-	mondrian.init_structure();
-	if(getContentIdFromUrl() != ""){
-		mondrian.focusContents(getContentIdFromUrl());
-	} else {
-		mondrian.focusContents("Coucool");
-		setTimeout(function(){mondrian.setFocusId(null)}, 2000);
-	}
-	adjust_background_sizes();
-	mondrian.render();
-});
-
-
-
-
 //////// CONTROLLER
 
 function on_mouse_enter() {
-	if( mondrian.allow_focus_on_mouse_enter &&
-		$(this).find(".content").attr('class').indexOf('static') < 0){
+	if($(this).find(".content").length > 0) {
+		if($(this).find(".content").attr('class').indexOf('non_focusable') < 0){
+			mondrian.setFocusId($(this).attr('id'));
+		}
+	} else {
 		mondrian.setFocusId($(this).attr('id'));
 	}
 }
 
 function on_mouse_leave() {
-	if(mondrian.allow_unfocus_on_mouse_leave){
+	if(!mondrian.show_focused_details){
 		mondrian.unfocus();
 	}
 }
@@ -654,74 +493,8 @@ function on_mouse_leave() {
 function setUrl(location) {
 	document.location.href = "#" + location ;
 	mondrian.requireUpdate();
-
-	/*
-	if (location != getContentIdFromUrl()) {
-		document.location.href = "#" + location ;
-		mondrian.requireUpdate();
-	} else {
-		console.log("inSetUrl");
-		mondrian.unfocus()
-	}
-	*/
 }
 
-function getContentIdFromUrl(){
-	var temp = document.URL.lastIndexOf("#");
-	if(temp !== -1){
-		pageName = document.URL.substring(temp + 1, document.URL.length);
-		return pageName
-	}
-	return ""
-}
-
-/*
-function setUrl(location) {
-	if (location != getContentIdFromUrl()) {
-		document.location.href = "#" + location ;
-		goToUrl();
-	} else {
-		mondrian.unfocus()
-	}
-}
-
-function goToUrl(){	
-		console.log("goToUrl");
-		var contentId = getContentIdFromUrl();
-
-		if (contentId == "") {
-			clearAllEndBoxes();
-			addMotion();
-		} else if (contentId == "Coucool" && !do_intro){
-			clearAllEndBoxes();
-			addMotion();
-		} else {
-			var $index_endBox = $("#"+ getContentIdFromUrl()).parent();
-			removeMotion();
-			setIncreasingEndBox($index_endBox);
-			setTimeout(addMotion, 50);
-		}
-		render();
-	}
-*/
-
-
-
-
-
-
-
-
-
-/*
-Here we want to set how the urls work.
-*/
-
-
-
-
-
-// FOR THE BACKGROUNDS
 $(window).resize(function () {
 	adjust_background_sizes();
 });
@@ -732,23 +505,11 @@ $(window).load(function () {
 	$.getScript("https://www.weezevent.com/js/widget/min/widget.min.js");
 });
 
-function adjust_background_sizes(){
-	adjust_non_static_background_sizes();
-	//adjust_static_background_sizes();
-}
+// FOR THE BACKGROUNDS TO COVER THE FRAME AND NOT THEIR OWN BOX
 
-function adjust_non_static_background_sizes() {
-	$('.content').each(function(i,obj) {
-		var is_not_static = $(obj).attr('class').indexOf('static') < 0
-		if(is_not_static) {
-			imitate_background_cover_behaviour(obj, true);
-		}
-	});
-}
-
-function adjust_static_background_sizes() {
-	$('.static').each(function(i,obj) {
-		imitate_background_cover_behaviour(obj, false);
+function adjust_background_sizes() {
+	$('.frame_cover').each(function(i,obj) {
+		imitate_background_cover_behaviour(obj, true);
 	});
 }
 
@@ -813,86 +574,5 @@ function getAdaptedBackgroundOffset(required_image_width, required_image_height,
 	required_image_offset_y = difference_height/2;	
 	return [required_image_offset_x, required_image_offset_y]
 }
-
-
-
-
-
-
-
-
-/*
- 
-Structure.prototype.listChildrenIds = function(id) { 
-	var ids = [];
-	this.applyAllChidren(function (struct) { ids.push(struct.id)});
-	return ids;
-}
-
-Structure.prototype.applyAllChidren = function(callback) {
-	callback(this);
-	if(this.child1){
-		this.child1.applyAllChidren(callback);
-	}
-	if(this.child2){
-		this.child2.applyAllChidren(callback);
-	}
-}
-
-Structure.prototype.applyInternalChildren = function(callback) {
-	if(this.child1 || this.child2){
-		callback(this);
-		if(this.child1){
-			this.child1.applyInternalChildren(callback);
-		}
-		if(this.child2){
-			this.child2.applyInternalChildren(callback);
-		}
-	}
-}
-
-
-Structure.prototype.increase = function() {
-	var id = this.id;
-	this.size = this.size+1;
-	this.getComplementary(mondrian.structure).size = (100 - this.size - 1);
-	if (this.id != mondrian.structure.id && this.size < 100) {
-		setTimeout(function(){
-			mondrian.structure.getById(id).increase()
-		}, polling_delay*20);
-	}
-	mondrian.requireUpdate();
-};
-
-
-
-$( ".box" )
-		.mouseenter(increaseOnHover)
-	  	.mouseleave(decreaseOnHover)
-		.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function(e) {
-});
-*/
-
-//console.log(mondrian.structure.child1.id());
-/*
-
-var ids = mondrian.structure.listChildrenIds();
-console.log(ids)
-
-var leaves_ids = mondrian.structure.listChildrenLeavesIds();
-console.log(leaves_ids)
-
-var node = mondrian.structure.getById(ids[0])
-console.log(node);
-
-var ids = []
-mondrian.structure.applyDown(function (struct) { ids.push(struct.id())});
-console.log(ids)
-
-console.log(mondrian.structure.child1.size);
-mondrian.structure.child1.size += 5;
-console.log(mondrian.structure.child1.size);
-*/
-
 
 

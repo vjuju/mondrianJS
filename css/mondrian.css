@@ -60,12 +60,6 @@ body {
     line-height: 28px;
 }
 
-.content.static {
-    background-attachment:initial !important;
-    background-size:cover !important;
-    background-position:center !important;
-}
-
 .content {
     position:absolute;
     display: none;
@@ -82,6 +76,9 @@ body {
 
 .artwork {
     background-image:url(../assets/artwork.jpg);
+    background-attachment:initial !important;
+    background-size:cover !important;
+    background-position:center !important;
 }
 
 .trees {
@@ -211,12 +208,8 @@ body {
 
 .details {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    max-height: 80%;
     left: 8%;
     right: 8%;
-
     font-size:18px;
     vertical-align: middle;
     text-align: justify;
@@ -227,23 +220,16 @@ body {
     display: none;
 }
 
-.stay {
-    position: absolute;
+.vertically_centered {
     top: 50%;
     transform: translateY(-50%);
     max-height: 80%;
-    left: 8%;
-    right: 8%;
-
-    font-size:18px;
-    vertical-align: middle;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    overflow-y: scroll;
-    display: block;
 }
 
+.row {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
 
 @media (max-width: 763px) {
     .header {      
