@@ -208,8 +208,11 @@ body {
 
 .details {
     position: absolute;
-    left: 8%;
-    right: 8%;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
+    max-width: 84%;
     font-size:18px;
     vertical-align: middle;
     text-align: justify;
@@ -249,6 +252,7 @@ body {
 #Curiosites .details {
     text-align: center;
     background-color: rgba(0,0,0,0.2);
+    width: 400px;
 }
 
 .white .details {

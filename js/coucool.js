@@ -15,6 +15,11 @@ $(document).ready(function () {
 	mondrian.render();
 });
 
+$(window).load(function () {
+	adjust_background_sizes();
+	$.getScript("./js/jquery.touchSwipe.min.js" );
+	$.getScript("https://www.weezevent.com/js/widget/min/widget.min.js");
+});
 
 
 function build_custom_structure(root) {
