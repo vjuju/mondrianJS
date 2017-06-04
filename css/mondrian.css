@@ -1,0 +1,394 @@
+@font-face { font-family: 'Josefin';       src:url('../fonts/JosefinSans-Regular.ttf'); }
+
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+    -ms-overflow-style: none;
+}
+
+body {
+    background-color: white;
+    font-family: 'Josefin'; 
+    font-size: 24px;
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+     -webkit-overflow-scrolling: touch;
+    font-family: 'Josefin'; 
+    /*font-size: 24px;*/
+    color: rgb(33,34,160);
+    overflow: hidden;
+    /*text-shadow: 2px 2px #ff0000;*/
+}
+
+::-moz-scrollbar { 
+    display: none; 
+}
+
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+.content::-webkit-scrollbar { 
+    display: none;  // Safari and Chrome
+}
+
+.content::-moz-scrollbar { 
+    display: none;  // Safari and Chrome
+}
+
+/* Structure */
+
+.fixedheader {
+    position: fixed;
+    text-align: left;
+    left:15px;
+    right:15px;
+    font-size:22px;
+    height: 35px;
+    line-height: 40px;
+}
+
+.fixedfooter {
+    position: fixed;
+    bottom: 0px;
+    left:15px;
+    right:15px;
+    font-size:16px;
+    height: 25px;
+    line-height: 28px;
+}
+
+.content {
+    position:absolute;
+    display: none;
+    top : 0px;
+    bottom: 0px;
+    right : 0px;
+    left:0px;
+    background-origin: 0px 0px;
+	background-repeat: no-repeat;
+	background-size: 0px 0px;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+.artwork {
+    background-image:url(../assets/artwork.jpg);
+    background-attachment:initial !important;
+    background-size:cover !important;
+    background-position:center !important;
+}
+
+.trees {
+    background-image:url(../assets/trees.jpg);
+}
+
+.night_sky {
+    background-image:url(../assets/night_sky.jpg);
+}
+
+.blue_clouds {
+    background-image:url(../assets/blue_clouds.jpg);
+}
+
+.orange_clouds {
+    background-image:url(../assets/orange_clouds.jpg);
+}
+
+.water {
+    background-image:url(../assets/water.jpg);
+}
+
+
+#frame {
+    position:absolute;
+    top:35px;
+    bottom:25px;
+    left:7px;
+    right:7px;
+}
+
+.box {
+        position:absolute; 
+}
+
+.innerBox {
+    position:absolute;
+    display: none;
+	overflow:hidden;
+}
+
+.box  .innerBox{
+    display: none;
+}
+
+.endBox .innerBox {
+    display: block;
+}
+
+.aggregate .innerBox {
+    display: block;
+}
+
+
+.aggregate .box  {
+    display: none;
+}
+
+
+
+.innerBox .content {
+    display: block;
+}
+
+.left {
+    height:100%;
+}
+
+.right {
+    height:100%;
+    right:0;
+}
+
+.top {
+    width:100%;
+    top:0;
+}
+
+.bottom {
+    width:100%;
+    bottom:0;
+}
+
+.transition {
+    -webkit-transition: all 5s ease 0s;
+    -moz-transition: all 5s ease 0s;
+    -ms-transition: all 5s ease 0s;
+    -o-transition: all 5s ease 0s;
+    transition: all 5s ease 0s;
+}
+
+
+#closeButton {
+    height: 40px;
+    width: 40px;
+    position:absolute;
+    padding-top:6px;
+    padding-left:6px;
+    right:0px;
+    font-size:30px;
+    z-index:20;
+    display: none;
+}
+
+
+
+/* Content */
+
+
+.header {
+    position: absolute;
+    left:0px;
+    padding-top: 5px;
+    font-size: 24px;
+    width: 100%;
+    text-align:left; 
+    height:40px; 
+    line-height:30px;
+}
+
+.contentBox {
+    position: absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+.details {
+    position: absolute;
+    left: 0; 
+    right: 0; 
+    margin-left: auto; 
+    margin-right: auto; 
+    max-width: 84%;
+    font-size:18px;
+    vertical-align: middle;
+    text-align: justify;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(255,255,255,0.7);
+    overflow-y: scroll;
+    display: none;
+}
+
+.vertically_centered {
+    top: 50%;
+    transform: translateY(-50%);
+    max-height: 80%;
+}
+
+.row {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+@media (max-width: 763px) {
+    .header {      
+        font-size: 20px;
+    }
+    .tagline {
+        display: none;
+    }
+    .details {
+        font-size: 18px;
+    }
+    #closeButton {
+        font-size:24px;
+    }
+}
+
+#Curiosites .details {
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+    width: 400px;
+}
+
+.white .details {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.white {
+    color:white;
+}
+
+
+@keyframes example {
+    0% {font-size: 24px;}
+    50% {font-size: 30px;}
+    100% {font-size: 24px;}
+}
+
+a {
+    text-decoration: underline;
+    color: rgb(33,34,160);
+}
+
+.white a {
+    color:white;
+}
+
+.white #closeButton {
+    color:white;
+}
+
+a:hover {
+    color : rgb(137, 155, 204);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#closeButton:hover {
+    color : rgb(137, 155, 204);
+    cursor: pointer;
+}
+
+/*
+.contentBox {
+    position: absolute;
+    margin:auto;
+    width:100%;
+    height:100%;
+    padding-top:50px;
+    padding-bottom:10px;
+    padding-left: 8%;
+    padding-right: 8%;
+    overflow:hidden;
+}
+
+.details {
+    font-size:18px;
+    display:none;
+    vertical-align: middle;
+    text-align: justify;
+    width:100%;
+    height: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(255,255,255,0.7);
+    overflow: scroll;
+}
+
+.header {
+    position: absolute;
+    left:20px;
+    right:0;
+    padding-top: 5px;
+    font-size: 24px;
+    width: 100%;
+    background-color:transparent;
+    text-align:left; 
+    height:40px; 
+    line-height:30px;
+}
+
+
+@media (max-width: 763px) {
+    .header {      
+        font-size: 20px;
+    }
+    .tagline {
+        display: none;
+    }
+    .details {
+        font-size: 14px;
+    }
+    #closeButton {
+        font-size:24px;
+    }
+    .content {
+        background-size: auto 100% !important;
+    }
+    .artwork {
+        background-size: cover !important;
+    }
+}
+
+#Curiosites .details {
+    width: 100%;
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.white .details {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.white {
+    color:white;
+}
+
+
+@keyframes example {
+    0% {font-size: 24px;}
+    50% {font-size: 30px;}
+    100% {font-size: 24px;}
+}
+
+a {
+    text-decoration: underline;
+    color: rgb(33,34,160);
+}
+
+.white a {
+    color:white;
+}
+
+a:hover {
+    color : rgb(137, 155, 204);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+*/
